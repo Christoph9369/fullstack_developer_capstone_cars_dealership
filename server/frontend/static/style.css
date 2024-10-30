@@ -4,7 +4,7 @@ img{
 }
 
 .card{
-  border: rgb(103, 102, 105) 3px solid;
+  border: rgb(16, 16, 17) 3px solid;
   display: flex;  
   flex-direction: column;
   margin-left:5%;
@@ -124,4 +124,54 @@ img{
     border-radius:50px;
     text-align:center;
     box-shadow: 2px 2px 3px #999;  
+}
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+.image-section {
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.image-section img {
+    width: 100%;
+    border-radius: 10px;
+}
+.contact-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
+    flex-direction: row;
+    padding-top: 20px;
+}
+
+.contact-icon img {
+    width: 100%;
+}
+
+.contact-info p {
+    color: #333;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+.contact-detail {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    justify-content: space-evenly;
+}
+
+.vertical-divider {
+    width: 1px;
+    height: 280px;
+    background-color: #ccc;
 }
