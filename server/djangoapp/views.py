@@ -55,13 +55,66 @@ def login_user(request):
    
 
 # Create a `logout_request` view to handle sign out request
-# def logout_request(request):
-# ...
+def logout_request(request):
+    # Log out the user if they are authenticated
+    if request.user.is_authenticated:
+        logout(request)
+        response_data = {"status": "Logged out successfully"}
+        logger.info("User logged out successfully.")
+    else:
+        # User was not authenticated
+        response_data = {"status": "User is not logged in"}
+        logger.warning("Logout request made by a non-authenticated user.")
+    
+    return JsonResponse(response_data)
+
 
 # Create a `registration` view to handle sign up request
-# @csrf_exempt
-# def registration(request):
-# ...
+@csrf_exempt
+def registration(request):
+    # Only proceed if the request method is POST
+    if request.method == "POST":
+        try:
+            # Parse JSON data from request body
+            data = json.loads(request.body)
+            username = data.get('userName')
+            password = data.get('password')
+            first_name = data.get('firstName')
+            last_name = data.get('lastName')
+            email = data.get('email')
+
+            # Check if the username or email already exists
+            username_exist = User.objects.filter(username=username).exists()
+            email_exist = User.objects.filter(email=email).exists()
+
+            if username_exist:
+                return JsonResponse({"userName": username, "error": "Username already taken"})
+            elif email_exist:
+                return JsonResponse({"email": email, "error": "Email already registered"})
+
+            # Create and save the new user
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                email=email
+            )
+
+            # Log in the newly created user
+            login(request, user)
+
+            # Return a JSON response confirming successful registration and login
+            return JsonResponse({"userName": username, "status": "Authenticated"})
+
+        except json.JSONDecodeError:
+            # Handle JSON parsing error
+            logger.error("Invalid JSON received in registration request.")
+            return JsonResponse({"error": "Invalid JSON data"})
+        
+    # If the request method is not POST
+    return JsonResponse({"error": "POST method required"})
+
 
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
