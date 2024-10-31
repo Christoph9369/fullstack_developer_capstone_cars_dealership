@@ -7,12 +7,14 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import logout
 from django.contrib import messages
 from datetime import datetime
+from .populate import initiate  # Import the initiate function to populate data
 
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
+from .models import CarMake, CarModel
 # from .populate import initiate
 
 
@@ -132,3 +134,26 @@ def registration(request):
 # Create a `add_review` view to submit a review
 # def add_review(request):
 # ...
+# list of cars
+def get_cars(request):
+    # Count the number of CarMake entries in the database
+    count = CarMake.objects.count()
+    print(count)
+    
+    # Populate the database if no CarMake entries exist
+    if count == 0:
+        initiate()
+    
+    # Fetch all CarModel entries, including related CarMake data
+    car_models = CarModel.objects.select_related('car_make')
+    
+    # Prepare a list of dictionaries to hold the car models and makes
+    cars = []
+    for car_model in car_models:
+        cars.append({
+            "CarModel": car_model.name,
+            "CarMake": car_model.car_make.name
+        })
+    
+    # Return the list as a JSON response
+    return JsonResponse({"CarModels": cars})
