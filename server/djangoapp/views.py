@@ -1,12 +1,12 @@
 # Uncomment the required imports before adding the code
 
-# from django.shortcuts import render
-# from django.http import HttpResponseRedirect, HttpResponse
-# from django.contrib.auth.models import User
-# from django.shortcuts import get_object_or_404, render, redirect
-# from django.contrib.auth import logout
-# from django.contrib import messages
-# from datetime import datetime
+from django.shortcuts import render
+from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth import logout
+from django.contrib import messages
+from datetime import datetime
 
 from django.http import JsonResponse
 from django.contrib.auth import login, authenticate
@@ -25,18 +25,34 @@ logger = logging.getLogger(__name__)
 # Create a `login_request` view to handle sign in request
 @csrf_exempt
 def login_user(request):
-    # Get username and password from request.POST dictionary
-    data = json.loads(request.body)
-    username = data['userName']
-    password = data['password']
-    # Try to check if provide credential can be authenticated
-    user = authenticate(username=username, password=password)
-    data = {"userName": username}
-    if user is not None:
-        # If user is valid, call login method to login current user
-        login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
-    return JsonResponse(data)
+    if request.method == "POST":
+        try:
+            # Parse JSON body to extract username and password
+            data = json.loads(request.body)
+            username = data.get('userName')
+            password = data.get('password')
+            
+            # Authenticate user credentials
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                # Log the user in if credentials are valid
+                login(request, user)
+                response_data = {"userName": username, "status": "Authenticated"}
+            else:
+                # If credentials are invalid
+                response_data = {"userName": username, "status": "Authentication Failed"}
+                
+        except json.JSONDecodeError:
+            # Handle JSON parsing error
+            response_data = {"error": "Invalid JSON data"}
+            logger.error("Invalid JSON received in login request.")
+            
+    else:
+        # Respond with an error if the method is not POST
+        response_data = {"error": "POST method required"}
+    
+    return JsonResponse(response_data)
+   
 
 # Create a `logout_request` view to handle sign out request
 # def logout_request(request):
