@@ -161,34 +161,27 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request):
 def add_review(request):
-    if not request.user.is_anonymous:  # Check if the user is authenticated
-        data = json.loads(request.body)  # Load data from the request body
+    if(request.user.is_anonymous == False):
+        data = json.loads(request.body)
         try:
-            response = post_review(data)  # Call the post_review function
-            print(response)  # Optional: print the response for debugging
-            return JsonResponse({"status": 200, "message": "Review posted successfully"})
-        except Exception as e:
-            print(f"Error posting review: {e}")  # Print the exception for debugging
-            return JsonResponse({"status": 400, "message": "Error in posting review"})
+            response = post_review(data)
+            return JsonResponse({"status":200})
+        except:
+            return JsonResponse({"status":401,"message":"Error in posting review"})
     else:
-        return JsonResponse({"status": 403, "message": "Unauthorized"})
+        return JsonResponse({"status":403,"message":"Unauthorized"})
 # ...
 # list of cars
 def get_cars(request):
-    # Count the number of CarMake entries in the database
-    count = CarMake.objects.count()
+    count = CarMake.objects.filter().count()
     print(count)
-    # Populate the database if no CarMake entries exist
-    if count == 0:
+    if (count == 0):
         initiate()
-    # Fetch all CarModel entries, including related CarMake data
     car_models = CarModel.objects.select_related('car_make')
-    # Prepare a list of dictionaries to hold the car models and makes
     cars = []
     for car_model in car_models:
         cars.append({
             "CarModel": car_model.name,
             "CarMake": car_model.car_make.name
         })
-    # Return the list as a JSON response
     return JsonResponse({"CarModels": cars})
