@@ -24,8 +24,10 @@ class CarModel(models.Model):
     type = models.CharField(max_length=10, choices=CAR_TYPES, default="SUV")
 
     year = models.IntegerField(
-        default=2023, validators=[MaxValueValidator(2023), MinValueValidator(2015)]
+        default=2023, validators=[MaxValueValidator(2023), 
+        MinValueValidator(2015)]
     )
 
     def __str__(self):
-        return f"{self.car_make.name} {self.name}"  # Return the car make and model as the string representation
+        return f"{self.car_make.name} {self.name}" 
+
