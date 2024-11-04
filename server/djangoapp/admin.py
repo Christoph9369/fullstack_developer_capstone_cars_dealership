@@ -1,25 +1,30 @@
+# from django.contrib import admin
 from django.contrib import admin
 from .models import CarMake, CarModel
-
-@admin.register(CarMake)
-class CarMakeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country_of_origin', 'founded_year')
-    search_fields = ('name', 'country_of_origin')
-    list_filter = ('country_of_origin', 'founded_year')
-
-@admin.register(CarModel)
-class CarModelAdmin(admin.ModelAdmin):
-    list_display = ('name', 'car_make', 'type', 'year', 'dealer_id')
-    search_fields = ('name', 'car_make__name')
-    list_filter = ('type', 'year', 'car_make')
 
 
 # Register your models here.
 
+
 # CarModelInline class
+class CarModelInline(admin.TabularInline):
+    model = CarModel
+    extra = 1  # Number of extra forms displayed
+
 
 # CarModelAdmin class
+class CarModelAdmin(admin.ModelAdmin):
+    list_display = ["name", "type", "year", "car_make"]
+    list_filter = ["type", "year"]
+    search_fields = ["name", "car_make__name"]
+
 
 # CarMakeAdmin class with CarModelInline
+class CarMakeAdmin(admin.ModelAdmin):
+    list_display = ["name", "description"]
+    inlines = [CarModelInline]
+
 
 # Register models here
+admin.site.register(CarMake, CarMakeAdmin)
+admin.site.register(CarModel, CarModelAdmin)
